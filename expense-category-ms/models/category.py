@@ -1,9 +1,10 @@
 from sqlalchemy import Table, Column
-from sqlalchemy.sql.sqltypes import String
+from sqlalchemy.sql.sqltypes import String, Integer
 from config.db import meta, engine
 
 categories = Table("categories", meta, 
-    Column("name", String(255), primary_key= True),
+    Column("id", Integer, primary_key=True),
+    Column("name", String(255)),
     Column("description", String(255))
     )
 

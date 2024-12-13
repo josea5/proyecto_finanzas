@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from config.db import conn
 from models.category import categories
 from schemas.category import Category
@@ -12,5 +12,14 @@ def get_categories():
 @category.post("/categories")
 def create_category(category: Category):
     new_category = {"name": category.name, "description": category.description}
-    print(category)
-    return {"message": "Category created", "category": new_category}
+    result = conn.execute(categories.insert().values(new_category))
+    print(result)
+    return ""
+
+@category.get("/category/{id}")
+def get_category_by_id():
+    pass
+
+@category.delete("/category/{id}")
+def delete_category():
+    pass
