@@ -8,7 +8,10 @@ category = APIRouter()
 
 @category.get("/categories")
 def get_categories():
-    return conn.execute(categories.select()).fetchall()
+    result = conn.execute(categories.select()).fetchall()
+    categories_list = [dict(row._asdict()) for row in result]
+    
+    return categories_list
 
 @category.post("/categories")
 def create_category(category: Category):
@@ -28,12 +31,25 @@ def create_category(category: Category):
         return {"error": str(e)}
 
 @category.get("/categories/{id}")
-def get_category_by_name(id: str):
+def get_category_by_id(id: str):
     result = conn.execute(categories.select().where(categories.c.id == id)).first()
     if result is None:
         raise HTTPException(status_code=404, detail="Category not found")
     return dict(result._asdict())
 
-@category.delete("/category/{id}")
-def delete_category():
-    pass
+@category.delete("/categories/{id}")
+def delete_category(id: str):
+    conn.execute(categories.delete().where(categories.c.id == id))
+    conn.commit()
+    return "deleted"
+
+
+# A futuro (?)
+"""
+@category.get("/categories/{name}")
+def get_category_by_name(name: str):
+    result = conn.execute(categories.select().where(categories.c.name.ilike(name)))
+    if result is None:
+        raise HTTPException(status_code=404, detail="Category not found")
+    return dict(result._asdict())
+"""
