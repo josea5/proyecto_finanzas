@@ -1,0 +1,33 @@
+services:
+  mysql-categories:
+    image: mysql:8.0
+    container_name: mysql-categories
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql 
+    networks:
+      - app-network
+
+  fastapi-app:
+    build: .
+    container_name: fastapi-app
+    depends_on:
+      - mysql-categories
+    ports:
+      - "8000:8000"
+    networks:
+      - app-network
+    environment:
+      DATABASE_URL: ${DATABASE_URL} 
+  
+volumes:
+  mysql_data:
+
+networks:
+  app-network:
+    driver: bridge
