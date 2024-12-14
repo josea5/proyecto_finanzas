@@ -13,6 +13,7 @@ def get_categories():
 def create_category(category: Category):
     new_category = {"name": category.name, "description": category.description}
     result = conn.execute(categories.insert().values(new_category))
+    conn.commit()
     print(result)
     return ""
 
