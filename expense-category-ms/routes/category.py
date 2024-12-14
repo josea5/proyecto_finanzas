@@ -6,14 +6,14 @@ from sqlalchemy.exc import SQLAlchemyError
 
 category = APIRouter()
 
-@category.get("/categories")
+@category.get("/categories", tags=["Categories Methods"])
 def get_categories():
     result = conn.execute(categories.select()).fetchall()
     categories_list = [dict(row._asdict()) for row in result]
     
     return categories_list
 
-@category.post("/categories")
+@category.post("/categories", tags=["Categories Methods"])
 def create_category(category: Category):
     try:
         new_category = {"name": category.name, "description": category.description}
@@ -30,26 +30,27 @@ def create_category(category: Category):
         print(str(e))
         return {"error": str(e)}
 
-@category.get("/categories/{id}")
+@category.get("/categories/{id}", tags=["Categories Methods"])
 def get_category_by_id(id: str):
     result = conn.execute(categories.select().where(categories.c.id == id)).first()
     if result is None:
         raise HTTPException(status_code=404, detail="Category not found")
     return dict(result._asdict())
 
-@category.delete("/categories/{id}")
+@category.delete("/categories/{id}", tags=["Categories Methods"])
 def delete_category(id: str):
     conn.execute(categories.delete().where(categories.c.id == id))
     conn.commit()
     return "deleted"
 
 
-# A futuro (?)
-"""
-@category.get("/categories/{name}")
-def get_category_by_name(name: str):
-    result = conn.execute(categories.select().where(categories.c.name.ilike(name)))
-    if result is None:
-        raise HTTPException(status_code=404, detail="Category not found")
-    return dict(result._asdict())
-"""
+@category.put("/categories/{id}", tags=["Categories Methods"])
+def update_category(id: str, category: Category):
+    conn.execute(categories.update().values(
+        name = category.name,
+        description = category.description
+    ).where(categories.c.id == id)
+    )
+    conn.commit()
+    return "updated"
+
