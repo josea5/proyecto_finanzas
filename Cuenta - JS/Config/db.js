@@ -2,10 +2,10 @@ const { Pool } = require('pg');
 
 // Configuración para postgres clasico - Se mejora usando variables de entorno.
 const pool = new Pool({
-    user: 'tu_usuario',       
+    user: 'usuario',       
     host: 'localhost',        
     database: 'nombre_bd',    
-    password: 'tu_contraseña',
+    password: 'contraseña',
     port: 5432,               
 });
 
