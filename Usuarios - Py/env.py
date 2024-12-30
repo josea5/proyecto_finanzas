@@ -1,0 +1,5 @@
+SECRET_KEY = "mysecretkey"
+POSTGRES_USER = "usuario"
+POSTGRES_PASSWORD = "contrasena"
+POSTGRES_DB = "dbname"
+DATABASE_URL = "postgresql://usuario:contrasena@db/dbname"
