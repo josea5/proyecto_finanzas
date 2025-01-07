@@ -1,22 +1,20 @@
-const { Pool } = require('pg');
+const { Sequelize } = require('sequelize');
 
-// Configuración para postgres clasico - Se mejora usando variables de entorno.
-const pool = new Pool({
-    user: 'usuario',       
-    host: 'localhost',        
-    database: 'nombre_bd',    
-    password: 'contraseña',
-    port: 5432,               
-});
+// Cargar variables de entorno desde .env
+require('dotenv').config();
 
-// Esto es para corroborar si hemos entrado o no la base de datos
-pool.connect((err, client, release) => {
-    if (err) {
-        return console.error('Error conectando a PostgreSQL:', err.stack);
-    }
-    console.log('Conexión a PostgreSQL establecida.');
-    release();
-});
+// Crear instancia de Sequelize con las variables de entorno
+const sequelize = new Sequelize(
+  process.env.DB_NAME,       // Nombre de la base de datos
+  process.env.DB_USER,       // Usuario de la base de datos
+  process.env.DB_PASSWORD,   // Contraseña de la base de datos
+  {
+    host: process.env.DB_HOST, // Host del servidor de la base de datos
+    port: process.env.DB_PORT, // Puerto de la base de datos
+    dialect: 'postgres',       // Dialecto para PostgreSQL
+    logging: false,            // Desactivar logs (opcional)
+  }
+);
 
-// Lo exportamos para poder usar en otros archivos.
-module.exports = pool;
+// Exportar la instancia de Sequelize
+module.exports = sequelize;
