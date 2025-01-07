@@ -1,4 +1,5 @@
-import { BudgetModel } from "../models/budgetModel.js";
+import { BudgetModel } from "../models/local/budgetModel.js";
+//import { BudgetModel } from "../models/mysql/budgetModel.js";
 import { validateBudget, validatePartialBudget } from '../schemas/budgetSchema.js'
 
 export class BudgetController {
