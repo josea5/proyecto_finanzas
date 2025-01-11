@@ -1,0 +1,62 @@
+[
+    {
+      "id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+      "LimitAmount": 1000,
+      "StartDate": "2025-01-01",
+      "EndDate": "2025-01-31"
+    },
+    {
+      "id": "1d2f80ac-63b2-4c7d-9532-8b65d8ea9702",
+      "LimitAmount": 5000,
+      "StartDate": "2025-02-01",
+      "EndDate": "2025-06-30"
+    },
+    {
+      "id": "fbaed38a-4b5e-451f-94f3-4fcbfa05f8fe",
+      "LimitAmount": 300,
+      "StartDate": "2025-01-15",
+      "EndDate": "2025-03-15"
+    },
+    {
+      "id": "52c90093-f9be-4c56-b084-8c2d30cb2f13",
+      "LimitAmount": 15000,
+      "StartDate": "2025-04-01",
+      "EndDate": "2025-12-31"
+    },
+    {
+      "id": "9f77ac89-e9a7-4c7d-88f5-8fcdc9c53e7d",
+      "LimitAmount": 750,
+      "StartDate": "2025-03-01",
+      "EndDate": "2025-03-31"
+    },
+    {
+      "id": "c30f51c1-7424-4f32-8e36-e8a5c3d43890",
+      "LimitAmount": 2000,
+      "StartDate": "2025-05-01",
+      "EndDate": "2025-07-31"
+    },
+    {
+      "id": "32cdb78b-5988-4261-bd9f-e2c2b9f01043",
+      "LimitAmount": 1200,
+      "StartDate": "2025-06-15",
+      "EndDate": "2025-09-15"
+    },
+    {
+      "id": "528081f1-99c4-4268-94d0-9e9b4905f6ac",
+      "LimitAmount": 10000,
+      "StartDate": "2025-08-01",
+      "EndDate": "2025-08-31"
+    },
+    {
+      "id": "a0146ecb-7baf-44e9-9d18-d4f5fc76ec71",
+      "LimitAmount": 2500,
+      "StartDate": "2025-09-01",
+      "EndDate": "2025-11-30"
+    },
+    {
+      "id": "7c7e7ff3-b34c-4533-8a93-6e60bb6d0c94",
+      "LimitAmount": 500,
+      "StartDate": "2025-10-01",
+      "EndDate": "2025-10-31"
+    }
+]
