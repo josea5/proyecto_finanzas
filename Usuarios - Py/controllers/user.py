@@ -27,3 +27,11 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db:
         raise HTTPException(status_code=401, detail="Credenciales inválidas")
     access_token = security.create_access_token(data={"sub": user.correo})
     return {"access_token": access_token, "token_type": "bearer"}
+
+# Endpoint para enviar a los microservicios
+@router.get("/users/{user_id}", response_model=schemas.UserOut)
+def get_user_by_id(user_id: int, db: Session = Depends(get_db)):
+    user = crud.get_user_by_id(db, user_id=user_id)
+    if user is None:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    return user
