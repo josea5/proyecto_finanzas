@@ -1,6 +1,6 @@
-ec-env/
+#ec-env/
 __pycache__/
 config/__pycache__/
 routes/__pycache__/
 schemas/__pycache__/
-.env
+#.env
