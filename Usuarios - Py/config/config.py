@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Configuracion para conectarnos
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://usuario:contrasena@localhost/dbname")
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 # Clave secreta para JWT
 SECRET_KEY = os.getenv("SECRET_KEY", "mysecretkey")

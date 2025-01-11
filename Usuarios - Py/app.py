@@ -1,10 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from models import user
-from models.db import engine
+from models.db import engine  # Asegúrate de importar engine desde db.py
 from controllers import user as user_api
+from models.user import User  # Importa el modelo User
 
-user.Base.metadata.create_all(bind=engine)
+# Crear las tablas en la base de datos
+User.metadata.create_all(bind=engine)  # Ahora usar User.metadata, no User.Base
 
 app = FastAPI()
 
@@ -16,5 +17,5 @@ app.add_middleware(
     allow_headers=["*"],  
 )
 
-
+# Incluir el router para el controlador de usuarios
 app.include_router(user_api.router)
