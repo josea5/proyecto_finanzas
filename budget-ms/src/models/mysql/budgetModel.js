@@ -1,5 +1,4 @@
 import mysql from 'mysql2/promise'
-import { validate as isUUID } from 'uuid';
 
 //Configurar variables de entorno:
 const config = {
