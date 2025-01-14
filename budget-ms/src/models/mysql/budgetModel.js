@@ -86,6 +86,13 @@ export class BudgetModel{
                 'DELETE FROM Budget WHERE id = UUID_TO_BIN(?);',
                 [id]
             );
+
+            if (true) {
+                const del_Budget_Account = await connection.query(
+                    'DELETE FROM Budget_Account WHERE budgetId = UUID_TO_BIN(?);',
+                    [id]
+                );
+            }
     
             if (result.affectedRows === 0) return false;
     
@@ -97,63 +104,52 @@ export class BudgetModel{
     }
     
 
-    
-
+    // Revisar si se puede con mejores prácticas...
+    // Pero ya funciona :)
     static async update({ id, input }) {
-        // Verificar que el ID es un UUID válido
-        if (!isUUID(id)) {
-            throw new Error('El ID proporcionado no es un UUID válido');
-        }
-    
-        const { LimitAmount, StartDate, EndDate } = input;
-    
         try {
-            // Buscar el presupuesto con el UUID (sin convertir a binario)
-            const [budget] = await connection.query(
-                `SELECT BIN_TO_UUID(id) id, LimitAmount, StartDate, EndDate 
-                FROM Budget WHERE id = UUID_TO_BIN(?);`,
+            // Verificar si el presupuesto existe antes de intentar actualizarlo
+            const [existingBudget] = await connection.query(
+                'SELECT * FROM Budget WHERE id = UUID_TO_BIN(?);',
                 [id]
             );
     
-            // Si no se encuentra el presupuesto
-            if (!budget) {
-                throw new Error('No se encontró el presupuesto con ese ID');
-            }
+            if (existingBudget.length === 0) return false
     
-            // Crear el objeto con los datos actualizados, evitando pasar null en campos no proporcionados
-            const updatedBudget = {
-                LimitAmount: LimitAmount !== undefined ? LimitAmount : budget.LimitAmount,
-                StartDate: StartDate !== undefined ? StartDate : budget.StartDate,
-                EndDate: EndDate !== undefined ? EndDate : budget.EndDate
-            };
+            // Construir la consulta dinámica de actualización
+            const fields = Object.keys(input);
+            const values = fields.map(field => input[field]);
     
-            // Ejecutar la actualización
-            const result = await connection.query(
-                `UPDATE Budget
-                SET LimitAmount = ?, StartDate = ?, EndDate = ?
-                WHERE id = UUID_TO_BIN(?);`,
-                [updatedBudget.LimitAmount, updatedBudget.StartDate, updatedBudget.EndDate, id]
-            );
+            let setClause = fields.map(field => `${field} = ?`).join(', ');
     
-            if (result.affectedRows === 0) {
-                throw new Error('No se pudo actualizar el presupuesto');
-            }
+            // Consulta SQL de actualización
+            const sql = `UPDATE Budget SET ${setClause} WHERE id = UUID_TO_BIN(?)`;
+            values.push(id);  // Añadimos el id al final de los valores para el WHERE
     
-            // Recuperar el presupuesto actualizado
-            const [updatedBudgetResult] = await connection.query(
-                `SELECT BIN_TO_UUID(id) id, LimitAmount, StartDate, EndDate
-                FROM Budget WHERE id = UUID_TO_BIN(?);`,
+            // Ejecutar la consulta SQL de actualización
+            const [result] = await connection.query(sql, values);
+    
+            // Verificar si se actualizaron filas
+            if (result.affectedRows === 0) return false
+    
+            // Obtener el presupuesto actualizado
+            const [updatedBudget] = await connection.query(
+                'SELECT BIN_TO_UUID(id) id, LimitAmount, StartDate, EndDate FROM Budget WHERE id = UUID_TO_BIN(?);',
                 [id]
             );
-    
-            return updatedBudgetResult[0]; // Retornar el presupuesto actualizado
-    
-        } catch (e) {
-            console.error('Error details:', e);
-            throw new Error(`Error updating budget: ${e.message}`);
+
+            return updatedBudget[0];
+        } catch (error) {
+            throw new Error('Error al actualizar el presupuesto');
         }
-    }
-    
-    
-    
+    }    
 }
+
+
+// NOTAS:
+/* 
+    CREATE : falta la conexión con Cuenta, coordinar eso.
+    DELETE : Localmente puedo eliminar Budget_Account por Budget_id, pero no por Account_id (que ambos sean opcionales en la app final).
+    El resto también deberían de tener una conexión con esos.
+
+*/
