@@ -14,7 +14,6 @@ const connection = await mysql.createConnection(config);
 
 export class BudgetModel{
     static async getAll ({LimitAmount}) {
-        // todo
         if (LimitAmount) {
             const [result] = await connection.query(
                 'SELECT BIN_TO_UUID(id) id, LimitAmount, StartDate, EndDate FROM Budget WHERE LimitAmount >= ?;', 
@@ -30,7 +29,6 @@ export class BudgetModel{
     }
 
     static async getById ({id}) {
-        // todo
         const [result] = await connection.query(
             'SELECT BIN_TO_UUID(id) id, LimitAmount, StartDate, EndDate FROM Budget WHERE id = UUID_TO_BIN(?);',
             [id]
@@ -58,6 +56,16 @@ export class BudgetModel{
                 VALUES (UUID_TO_BIN(?), ?, ? ,?);`,
             [uuid, LimitAmount, StartDate, EndDate]
             );
+
+            // Conectar con Cuentas-ms e insertar Budget_Amount;
+            /* 
+            const Account_id = accountService.getAccountById({Account_id})
+
+            await connection.query(
+                `INSERT INTO Budget_Account ()`
+            )
+            */
+
         } catch (e) {
             console.error('Error details:', e);
             throw new Error(`Error creating budget: ${e.message}`);

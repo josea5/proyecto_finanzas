@@ -1,10 +1,22 @@
-version: '3.9'
-
 services:
+  db:
+    image: postgres:15
+    container_name: cuenta_db
+    ports:
+      - "5432:5432" 
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - cuenta_network
+
   cuenta-service:
     build:
       context: .
-      dockerfile: Dockerfile
+      #dockerfile: Dockerfile
     container_name: cuenta_service
     ports:
       - "3001:3001" 
@@ -19,20 +31,6 @@ services:
       - db 
     volumes:
       - .:/app
-    networks:
-      - cuenta_network
-
-  db:
-    image: postgres:15
-    container_name: cuenta_db
-    ports:
-      - "5432:5432" 
-    environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${DB_NAME}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
     networks:
       - cuenta_network
 
