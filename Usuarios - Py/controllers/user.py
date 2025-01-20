@@ -6,6 +6,7 @@ from crud import user as crud
 from schemas import user as schemas
 import security
 
+
 router = APIRouter()
 
 # Crear un usuario
