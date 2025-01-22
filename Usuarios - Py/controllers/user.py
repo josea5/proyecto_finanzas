@@ -2,11 +2,15 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from models.db import get_db  
 from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordBearer
 from crud import user as crud
 from schemas import user as schemas
+from schemas.user import UserOut
 import security
+from config.config import SECRET_KEY, ALGORITHM
+from jose import JWTError, jwt
 
-
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 router = APIRouter()
 
 # Crear un usuario
@@ -29,10 +33,20 @@ def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db:
     access_token = security.create_access_token(data={"sub": user.correo})
     return {"access_token": access_token, "token_type": "bearer"}
 
-# Endpoint para enviar a los microservicios
-@router.get("/users/{user_id}", response_model=schemas.UserOut)
-def get_user_by_id(user_id: int, db: Session = Depends(get_db)):
-    user = crud.get_user_by_id(db, user_id=user_id)
-    if user is None:
-        raise HTTPException(status_code=404, detail="Usuario no encontrado")
-    return user
+# Validar token para las otras APIs
+@router.get("/validate-token", response_model=UserOut)
+def validate_token(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
+    try:
+        # Decodificar el token
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_email = payload.get("sub")  # El correo electrónico (o ID) del usuario
+        if user_email is None:
+            raise HTTPException(status_code=403, detail="Token inválido")
+
+        # Obtener el usuario de la base de datos
+        user = crud.get_user_by_email(db, correo=user_email)
+        if not user:
+            raise HTTPException(status_code=404, detail="Usuario no encontrado")
+        return user  # Devolver la información del usuario
+    except JWTError:
+        raise HTTPException(status_code=403, detail="Token inválido o expirado")

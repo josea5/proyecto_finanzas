@@ -7,14 +7,14 @@ services:
       dockerfile: Dockerfile
     container_name: cuenta_service
     ports:
-      - "3001:3001" 
+      - "3002:3002" 
     environment:
       - DB_NAME=${DB_NAME}
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_HOST=db
-      - DB_PORT=5432
-      - PORT=3001
+      - DB_PORT=5433
+      - PORT=3002
     depends_on:
       - db 
     volumes:
@@ -26,7 +26,7 @@ services:
     image: postgres:15
     container_name: cuenta_db
     ports:
-      - "5432:5432" 
+      - "5433:5432" 
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}

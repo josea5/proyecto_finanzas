@@ -1,13 +1,23 @@
 const axios = require('axios');
 
 const validarUsuario = async (req, res, next) => {
-  const { usuarioId } = req.body;  // Aquí es donde recibes el usuarioId
+  const token = req.headers.authorization?.split(' ')[1];  // Obtener token del header Authorization
+
+  if (!token) {
+    return res.status(400).json({ error: 'Token no proporcionado' });
+  }
 
   try {
-    const respuesta = await axios.get(`http://linkdelmicroservicio/users/${usuarioId}`);
+    // Validar el token con el microservicio de usuarios
+    const respuesta = await axios.get('http://localhost:3001/validate-token', {
+      headers: {
+        Authorization: `Bearer ${token}`,  // Pasar el token al microservicio de usuarios
+      },
+    });
 
     if (respuesta.status === 200) {
-      next();  // Usuario encontrado, pasa al siguiente middleware
+      req.user = respuesta.data;  // Almacenar la información del usuario en el request
+      next();  // Usuario validado, continuar con la siguiente acción
     } else {
       return res.status(404).json({ error: 'Usuario no encontrado' });
     }
