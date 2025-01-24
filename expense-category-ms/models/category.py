@@ -5,7 +5,8 @@ from config.db import meta, engine
 categories = Table("categories", meta, 
     Column("id", Integer, primary_key=True),
     Column("name", String(255), unique=True),
-    Column("description", String(255))
+    Column("description", String(255)),
+    Column("user_id", Integer)
     )
 
 meta.create_all(engine)

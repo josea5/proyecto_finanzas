@@ -3,8 +3,13 @@ from config.db import conn
 from models.category import categories
 from schemas.category import Category
 from sqlalchemy.exc import SQLAlchemyError
+from services.ms_users import get_user_by_id
 
 category = APIRouter()
+
+# categories -> tabla SQL
+# Category -> Objeto
+# category -> router
 
 @category.get("/categories", tags=["Categories Methods"])
 def get_categories():
@@ -16,7 +21,13 @@ def get_categories():
 @category.post("/categories", tags=["Categories Methods"])
 def create_category(category: Category):
     try:
-        new_category = {"name": category.name, "description": category.description}
+        user = get_user_by_id(category.user_id)
+
+        if user is None:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+        
+        new_category = {"name": category.name, "description": category.description, "user_id" : category.user_id}
+
         result = conn.execute(categories.insert().values(new_category))
         conn.commit()
 
@@ -33,10 +44,11 @@ def create_category(category: Category):
         return inserted_category_dict, status.HTTP_201_CREATED
     except SQLAlchemyError as e:
         print(str(e))
+        conn.rollback()
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Database error")
 
 @category.get("/categories/{id}", tags=["Categories Methods"])
-def get_category_by_id(id: str):
+def get_category_by_id(id: int):
     result = conn.execute(categories.select().where(categories.c.id == id)).first()
     if result is None:
         raise HTTPException(status_code=404, detail="Category not found")
@@ -68,9 +80,34 @@ def update_category(id: str, category: Category):
         if result.rowcount == 0:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Category not found")
 
-        return "updated"
+        return {"message": "Category updated", "category": dict(result._asdict())}, status.HTTP_200_OK
 
     except SQLAlchemyError as e:
         conn.rollback()
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Database error")
 
+@category.get("/categories/user/{user_id}", tags=["Categories-User Methods"])
+def get_categories_by_user_id(user_id: int):
+    # Obtener todas las categorías que tengan este user_id
+    result = conn.execute(categories.select().where(categories.c.user_id == user_id)).fetchall()
+    categories_list = [dict(row._asdict()) for row in result]
+    
+    if not categories_list:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No categories found for this user")
+    
+    return categories_list
+
+@category.delete("/categories/user/{user_id}", tags=["Categories-User Methods"])
+def delete_categories_by_user_id(user_id: int):
+    try:
+        # Eliminar todas las categorías asociadas al user_id
+        result = conn.execute(categories.delete().where(categories.c.user_id == user_id))
+        conn.commit()
+        
+        if result.rowcount == 0:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No categories found for this user")
+        
+        return {"message": f"Deleted {result.rowcount} categories for user {user_id}"}
+    except SQLAlchemyError as e:
+        conn.rollback()
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error deleting categories")

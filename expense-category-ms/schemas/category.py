@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 
 class Category(BaseModel):
-    id : str | None = None
+    id : int | None = None
     name: str
     description: str | None = None
+    user_id: int

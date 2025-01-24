@@ -50,3 +50,22 @@ def validate_token(token: str = Depends(oauth2_scheme), db: Session = Depends(ge
         return user  # Devolver la información del usuario
     except JWTError:
         raise HTTPException(status_code=403, detail="Token inválido o expirado")
+
+
+@router.delete("/users/{user_id}", response_model=UserOut)
+def delete_user(user_id: int, db: Session = Depends(get_db)):
+    # 1. Buscar al usuario en la base de datos
+    user = crud.get_user_by_id(db, user_id=user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+
+    # 2. Eliminar categorías asociadas al usuario en el microservicio de categorías
+    try:
+        await delete_categories_by_user_id(user_id)  # Llamada a la función para eliminar categorías
+    except HTTPException as e:
+        raise HTTPException(status_code=e.status_code, detail=e.detail)
+
+    # 3. Eliminar al usuario de la base de datos
+    crud.delete_user(db, user_id=user_id)  # Asegúrate de tener un método `delete_user` en tu CRUD
+
+    return user  # Devuelves el usuario eliminado como confirmación
