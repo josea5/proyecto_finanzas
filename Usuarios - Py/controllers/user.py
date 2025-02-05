@@ -9,6 +9,7 @@ from schemas.user import UserOut
 import security
 from config.config import SECRET_KEY, ALGORITHM
 from jose import JWTError, jwt
+from services.ms_categories import delete_categories_by_user_id
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 router = APIRouter()
@@ -27,7 +28,7 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
 # Validación de login
 @router.post("/login")
 def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
-    user = crud.get_user_by_email(db, correo=form_data.username)
+    user = crud.get_user_by_username(db, username = form_data.username)
     if not user or not security.verify_password(form_data.password, user.hashed_password):
         raise HTTPException(status_code=401, detail="Credenciales inválidas")
     access_token = security.create_access_token(data={"sub": user.correo})
@@ -53,7 +54,7 @@ def validate_token(token: str = Depends(oauth2_scheme), db: Session = Depends(ge
 
 
 @router.delete("/users/{user_id}", response_model=UserOut)
-def delete_user(user_id: int, db: Session = Depends(get_db)):
+async def delete_user(user_id: int, db: Session = Depends(get_db)):
     # 1. Buscar al usuario en la base de datos
     user = crud.get_user_by_id(db, user_id=user_id)
     if not user:
@@ -69,3 +70,10 @@ def delete_user(user_id: int, db: Session = Depends(get_db)):
     crud.delete_user(db, user_id=user_id)  # Asegúrate de tener un método `delete_user` en tu CRUD
 
     return user  # Devuelves el usuario eliminado como confirmación
+
+@router.get("/users/{user_id}", response_model=UserOut)
+async def get_user(user_id: int, db: Session = Depends(get_db)):
+    user = crud.get_user_by_id(db,user_id=user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    return user

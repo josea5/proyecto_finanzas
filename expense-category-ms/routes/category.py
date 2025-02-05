@@ -19,9 +19,9 @@ def get_categories():
     return categories_list
 
 @category.post("/categories", tags=["Categories Methods"])
-def create_category(category: Category):
+async def create_category(category: Category):
     try:
-        user = get_user_by_id(category.user_id)
+        user = await get_user_by_id(category.user_id)
 
         if user is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")

@@ -1,7 +1,7 @@
 import httpx
 from fastapi import HTTPException
 
-CATEGORIES_SERVICE_URL = "http://localhost:8002"  # Cambia esta URL a la correcta
+CATEGORIES_SERVICE_URL = "http://localhost:8000"  # Cambia esta URL a la correcta
 
 async def delete_categories_by_user_id(user_id: int):
     async with httpx.AsyncClient() as client:

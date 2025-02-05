@@ -1,7 +1,7 @@
 import httpx
 from fastapi import HTTPException, status
 
-USERS_SERVICE_URL = "http://localhost:8001"
+USERS_SERVICE_URL = "http://localhost:3001"
 
 async def get_user_by_id(user_id: int):
     try:
