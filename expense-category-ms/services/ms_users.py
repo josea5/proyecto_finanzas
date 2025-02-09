@@ -1,25 +1,23 @@
 import httpx
 from fastapi import HTTPException, status
 
-USERS_SERVICE_URL = "http://localhost:3001"
 
 async def get_user_by_id(user_id: int):
-    try:
-        async with httpx.AsyncClient() as client:
-            response = await client.get(f"{USERS_SERVICE_URL}/users/{user_id}")
-            response.raise_for_status()
-            return response.json()
+    # URL de la API de usuarios (reemplazar con la URL y puerto de tu microservicio de usuarios)
+    url = f"http://localhost:3001/users/{user_id}"
 
-    except httpx.RequestError as e:
-        # Si hay un problema de red o el microservicio no está disponible
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE, 
-            detail=f"Error connecting to Users service: {str(e)}"
-        )
+    async with httpx.AsyncClient() as client:
+        try:
+            # Hacer la solicitud GET al microservicio de usuarios
+            response = await client.get(url)
 
-    except httpx.HTTPStatusError as e:
-        # Si el microservicio de usuarios devuelve un código de error (ej. 404, 500)
-        raise HTTPException(
-            status_code=e.response.status_code,
-            detail=f"Users service returned an error: {e.response.text}"
-        )
+            # Si el código de respuesta es 200, el usuario existe
+            if response.status_code == 200:
+                return response.json()
+            else:
+                # Si no encuentra el usuario, retorna None
+                return None
+        except httpx.RequestError as e:
+            # Manejo de errores si no se puede conectar a la API
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                                detail=f"Error de conexión con el servicio de usuarios: {str(e)}")
